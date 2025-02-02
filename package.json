@@ -1,0 +1,24 @@
+{
+  "name": "ksr_talit_connect4",
+  "type": "module",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tkilla77/ksr_talit_connect4.git"
+  },
+  "author": "Tom Hofmann",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tkilla77/ksr_talit_connect4/issues"
+  },
+  "homepage": "https://github.com/tkilla77/ksr_talit_connect4#readme",
+  "description": "",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2"
+  }
+}
