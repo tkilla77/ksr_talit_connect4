@@ -59,3 +59,9 @@ c4-grid button:not([data-state]):hover,
 c4-grid button[data-state="0"]:hover {
     background-color: var(--hover-color);
 }
+
+c4-status {
+    display: block;
+    padding: 1em;
+    text-align: center;
+}

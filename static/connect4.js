@@ -22,6 +22,26 @@ function updateHtml(grid, game) {
   }
 }
 
+function playerName(playerId) {
+  if (playerId == 1) {
+    return "yellow";
+  } else if (playerId == 2) {
+    return "red";
+  } else {
+    return "nobody";
+  }
+}
+
+function updateStatus(status, game) {
+  if (game.state == "playing") {
+    status.innerHTML = `Playing, next turn: ${playerName(game.next)}.`;
+  } else if (game.state == "tie") {
+    status.innerHTML = `It's a <b>tie</b>!`;
+  } else {
+    status.innerHTML = `<b>${playerName(game.next)}</b> has won!`;
+  }
+}
+
 function toCellIndex(coords) {
   return coords[1]*7 + coords[0];
 }
@@ -116,8 +136,11 @@ function checkWinner(game, cell) {
 }
 
 /** Drops a piece in the given column and updates the game state accordingly. */
-function dropPiece(grid, game, column) {
+function dropPiece(grid, status, game, column) {
   // Check if move is valid.
+  if (game.state != "playing") {
+    return;
+  }
   let row = computeEmptyRow(game, column);
   let cell = row * 7 + column;
   // Update game state.
@@ -130,19 +153,22 @@ function dropPiece(grid, game, column) {
   // Update the HTML view.
   updateHtml(grid, game);
   // TODO: update game status area to reflect winner / tie
+  updateStatus(status, game);
 }
 
 /* Connects the game state to the HTML user interface. */
 function init() {
   // Find the HTML game grid.
-  grid = document.getElementsByTagName('c4-grid')[0];
+  let grid = document.getElementsByTagName('c4-grid')[0];
+  let status = document.getElementsByTagName('c4-status')[0];
   updateHtml(grid, game);
+  updateStatus(status, game);
 
   // Install button click handlers for each button.
   let index = 0
   for (let button of grid.getElementsByTagName("button")) {
     const column = index % 7;
-    button.addEventListener("click", () => dropPiece(grid, game, column));
+    button.addEventListener("click", () => dropPiece(grid, status, game, column));
     index++;
   }
 }
