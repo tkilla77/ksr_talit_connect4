@@ -1,3 +1,5 @@
+let game = undefined;
+
 /** Updates the HTML user interface to match the given game state. */
 function updateHtml(grid, game) {
   let board = grid.getElementsByTagName("button");
@@ -20,8 +22,12 @@ function playerName(playerId) {
 }
 
 function updateStatus(status, game) {
-  if (game.state == "playing") {
-    status.innerHTML = `Playing, next turn: ${playerName(game.next)}.`;
+  if (game.state == "playing" && game.myturn) {
+    status.innerHTML = `It's your turn, you are ${playerName(game.next)}.`;
+  } else if (game.state == "playing") {
+    status.innerHTML = `Waiting for ${playerName(game.next)} to play.`;
+  } else if (game.state == "waiting") {
+    status.innerHTML = `Waiting for other players to join`;
   } else if (game.state == "tie") {
     status.innerHTML = `It's a <b>tie</b>!`;
   } else {
@@ -30,37 +36,45 @@ function updateStatus(status, game) {
 }
 
 /** Drops a piece in the given column and updates the game state accordingly. */
-async function dropPiece(grid, status, game, column) {
+async function dropPiece(grid, status, column) {
   // Check if move is valid.
-  if (game.state != "playing") {
+  if (!game.myturn) {
     return;
   }
 
-  let response = await fetch(`set/0/${column}`);
-  game = await response.json();
+  handleFetch(grid, status, `set/${game.id}/${column}`);
+}
 
+// wait ms milliseconds
+async function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function handleFetch(grid, status, url) {
+  let response = await fetch(url);
+  game = await response.json();
   // Update the HTML view.
   updateHtml(grid, game);
   // Update game status area to reflect winner / tie
   updateStatus(status, game);
+  while (game.state == "waiting" || game.state == "playing" && !game.myturn) {
+    await wait(500);
+    await handleFetch(grid, status, `game/${game.id}`);
+  }
 }
 
 /* Connects the game state to the HTML user interface. */
 async function init() {
   // Find the HTML game grid.
-  let game_id = 0;
-  let response = await fetch(`game/${game_id}`);
-  let game = await response.json();
   let grid = document.getElementsByTagName('c4-grid')[0];
   let status = document.getElementsByTagName('c4-status')[0];
-  updateHtml(grid, game);
-  updateStatus(status, game);
+  await handleFetch(grid, status, `join`);
 
   // Install button click handlers for each button.
   let index = 0
   for (let button of grid.getElementsByTagName("button")) {
     const column = index % 7;
-    button.addEventListener("click", () => dropPiece(grid, status, game, column));
+    button.addEventListener("click", () => dropPiece(grid, status, column));
     index++;
   }
 }

@@ -1,6 +1,7 @@
-export function newGame() {
+export function newGame(game_id) {
   return {
-    "state": "playing",  // or "waiting" or "won" or "tie"
+    "id": game_id,
+    "state": "waiting",  // or "waiting" or "won" or "tie"
     "board": [
       0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0,
@@ -10,6 +11,36 @@ export function newGame() {
       0, 0, 0, 0, 0, 0, 0,
     ],
     "next": 1,  // 1 or 2, the player whose turn it is, the winner if state is "won"
+    "player1": undefined,
+    "player2": undefined,
+  }
+}
+export function toJson(game, userid) {
+  let copy = structuredClone(game);
+  if (game.state == "playing") {
+    if (copy.player1 == userid && copy.next == 1 || copy.player2 == userid && copy.next == 2) {
+      copy["myturn"] = true;
+    }
+  } else if (game.state == "won") {
+    if (copy.player1 == userid && copy.next == 1 || copy.player2 == userid && copy.next == 2) {
+      copy["winner"] = true;
+    }
+  }
+  return copy;
+}
+export function isWaiting(game, userid) {
+  return game.state == "waiting" && game.player1 != userid;
+
+}
+export function joinGame(game, userid) {
+  if (!isWaiting(game, userid)) {
+    throw Error("Not waiting!");
+  }
+  if (game.player1 == undefined) {
+    game.player1 = userid;
+  } else {
+    game.player2 = userid;
+    game.state = "playing";
   }
 }
 

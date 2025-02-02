@@ -1,26 +1,63 @@
 import express from 'express'
-import { newGame, dropPiece } from './connect4.js'
+import cookieParser from 'cookie-parser'
+import { newGame, dropPiece, toJson, isWaiting, joinGame } from './connect4.js'
 
 const app = express()
+app.use(cookieParser())
 const port = 3001
 
-let the_game = newGame();
+let nextGameId = 0;
+let games = {};
  
 // Serve all files from static/ as is.
 // For example, a request for '/connect4.html' will be served from
 // 'static/connect4.html'
 app.use(express.static('static'))
 
-app.get('/game/:gameid', (req, res) => {
-    // For now, we only have a single game, so ignore the gameid.
-    return res.json(the_game);
-})
+function getUserId(req, res) {
+    let userid = req.cookies.userid
+    if (userid == undefined) {
+        userid = crypto.randomUUID()
+        res.cookie('userid', userid)
+    }
+    return userid
+}
  
+app.get('/join', (req, res) => {
+    const userid = getUserId(req, res)
+    for (let game of Object.values(games)) {
+        if (isWaiting(game, userid)) {
+            joinGame(game, userid)
+            res.json(toJson(game, userid))
+            return
+        }
+    }
+    // No waiting game found - create a new one
+    let game = newGame(nextGameId)
+    games[nextGameId] = game
+    nextGameId += 1
+    
+    joinGame(game, userid)
+    res.json(toJson(game, userid))
+})
+
+app.get('/game/:gameid', (req, res) => {
+    const userid = getUserId(req, res);
+    const game = games[parseInt(req.params['gameid'])]
+    res.json(toJson(game, userid))
+})
+
 app.get('/set/:gameid/:column', (req, res) => {
-    // For now, we only have a single game, so ignore the gameid.
-    let column = parseInt(req.params['column']);
-    dropPiece(the_game, column);
-    res.json(the_game)
+    const userid = getUserId(req, res);
+    const game = games[parseInt(req.params['gameid'])]
+    if (game.player1 == userid && game.next == 1 || game.player2 == userid && game.next == 2) {
+        let column = parseInt(req.params['column']);
+        dropPiece(game, column);
+        res.json(toJson(game, userid));
+    } else {
+        res.status(403);
+        res.json("Not your turn, my friend");
+    }
 })
 
 // Listen on the given port
