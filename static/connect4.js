@@ -41,7 +41,7 @@ async function dropPiece(grid, status, game, column) {
 
   // Update the HTML view.
   updateHtml(grid, game);
-  // TODO: update game status area to reflect winner / tie
+  // Update game status area to reflect winner / tie
   updateStatus(status, game);
 }
 
