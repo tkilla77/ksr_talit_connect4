@@ -56,6 +56,6 @@ c4-grid button[data-state="2"] {
 }
 
 c4-grid button:not([data-state]):hover,
-c4-grid button[data-state="0"] {
+c4-grid button[data-state="0"]:hover {
     background-color: var(--hover-color);
 }
