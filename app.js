@@ -4,7 +4,7 @@ import { newGame, dropPiece, toJson, isWaiting, joinGame } from './connect4.js'
 
 const app = express()
 app.use(cookieParser())
-const port = 3001
+const port = 0
 
 let nextGameId = 0;
 let games = {};
@@ -61,6 +61,6 @@ app.get('/set/:gameid/:column', (req, res) => {
 })
 
 // Listen on the given port
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+const server = app.listen(port, () => {
+    console.log(`Example app listening on http://localhost:${server.address().port}/connect4.html`)
 })
