@@ -44,13 +44,19 @@ app.get('/join', (req, res) => {
 app.get('/game/:gameid', (req, res) => {
     const userid = getUserId(req, res);
     const game = games[parseInt(req.params['gameid'])]
-    res.json(toJson(game, userid))
+    if (game == undefined) {
+        res.status(401).json("no such game");
+    } else {
+        res.json(toJson(game, userid))
+    }
 })
 
 app.get('/set/:gameid/:column', (req, res) => {
     const userid = getUserId(req, res);
     const game = games[parseInt(req.params['gameid'])]
-    if (game.player1 == userid && game.next == 1 || game.player2 == userid && game.next == 2) {
+    if (game == undefined) {
+        res.status(401).json("no such game");
+    }else if (game.player1 == userid && game.next == 1 || game.player2 == userid && game.next == 2) {
         let column = parseInt(req.params['column']);
         dropPiece(game, column);
         res.json(toJson(game, userid));
