@@ -5,6 +5,7 @@
     --player1-color: yellow;
     --player2-color: red;
     --shadow-color: rgba(0, 0, 0, 0.445);
+    --highlight-color: rgba(0, 0, 0, 0);
 }
 
 html {
@@ -35,7 +36,7 @@ c4-grid {
     border: solid 0.3em var(--plastic-color);
     background-color: var(--plastic-color);
     border-radius: 1em;
-	box-shadow: 0 0 1em var(--shadow-color);
+    box-shadow: 0.2em 0.2em 0.3em var(--shadow-color);
 }
 
 c4-grid button {
@@ -43,16 +44,18 @@ c4-grid button {
     background-color: var(--background-color);
     border-radius: 50%;
     border: none;
-    box-shadow: inset 0 0 0.3em var(--shadow-color);
-    transition: background-color 0.2s;
+    box-shadow: -0.1em -0.1em 0.1em var(--shadow-color), 0.1em 0.1em 0.1em var(--highlight-color), inset 0.5em 0.5em 0.3em var(--shadow-color);
+    transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 c4-grid button[data-state="1"] {
     background-color: var(--player1-color);
+    box-shadow:  -0.1em -0.1em 0.1em var(--shadow-color), 0.1em 0.1em 0.1em var(--highlight-color), inset 0.2em 0.2em 0.3em var(--shadow-color);
 }
 
 c4-grid button[data-state="2"] {
     background-color: var(--player2-color);
+    box-shadow:  -0.1em -0.1em 0.1em var(--shadow-color), 0.1em 0.1em 0.1em var(--highlight-color), inset 0.2em 0.2em 0.3em var(--shadow-color);
 }
 
 c4-grid button:not([data-state]):hover,
