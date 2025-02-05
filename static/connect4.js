@@ -52,11 +52,13 @@ async function wait(ms) {
 
 async function handleFetch(grid, status, url) {
   let response = await fetch(url);
-  game = await response.json();
-  // Update the HTML view.
-  updateHtml(grid, game);
-  // Update game status area to reflect winner / tie
-  updateStatus(status, game);
+  if (response.ok) {
+    game = await response.json();
+    // Update the HTML view.
+    updateHtml(grid, game);
+    // Update game status area to reflect winner / tie
+    updateStatus(status, game);
+  }
   while (game.state == "waiting" || game.state == "playing" && !game.myturn) {
     await wait(500);
     await handleFetch(grid, status, `game/${game.id}`);
