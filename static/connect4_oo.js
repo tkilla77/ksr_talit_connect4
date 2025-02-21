@@ -213,6 +213,7 @@ function dropPiece(grid, status, game, column) {
   updateStatus(status, game.game);
 }
 
+/** Create HTML buttons for game grid, and adapt the CSS repeat. */
 function createHtmlGrid(game, grid) {
   grid.style['grid-template-columns'] = `repeat(${game.columns}, 1fr)`
   for (let cell = 0; cell < game.rows * game.columns; cell++) {
