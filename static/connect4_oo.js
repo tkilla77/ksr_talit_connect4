@@ -118,7 +118,7 @@ class C4Board {
     }
 
     // No winner - check for tie.
-    for (let column of [0, 1, 2, 3, 4, 5, 6]) {
+    for (let column = 0; column < this.columns; column++) {
       if (this.at(Point.at(column, 0)) == 0) {
         return; // empty cell found - not a tie.
       }
