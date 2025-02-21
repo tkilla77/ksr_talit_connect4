@@ -213,19 +213,28 @@ function dropPiece(grid, status, game, column) {
   updateStatus(status, game.game);
 }
 
+function createHtmlGrid(game, grid) {
+  grid.style['grid-template-columns'] = `repeat(${game.columns}, 1fr)`
+  for (let cell = 0; cell < game.rows * game.columns; cell++) {
+    let button = document.createElement('button')
+    grid.appendChild(button)
+  }
+}
+
 /* Connects the game state to the HTML user interface. */
 function init() {
+  let game = C4Board.emptyBoard(10, 4, 4);
   // Find the HTML game grid.
   let grid = document.getElementsByTagName('c4-grid')[0];
+  createHtmlGrid(game, grid);
   let status = document.getElementsByTagName('c4-status')[0];
-  let game = C4Board.defaultBoard();
   updateHtml(grid, game.game);
   updateStatus(status, game.game);
 
   // Install button click handlers for each button.
   let index = 0
   for (let button of grid.getElementsByTagName("button")) {
-    const column = index % 7;
+    const column = index % game.columns;
     button.addEventListener("click", () => dropPiece(grid, status, game, column));
     index++;
   }
