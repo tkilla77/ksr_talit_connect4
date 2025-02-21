@@ -169,7 +169,8 @@ class C4Board {
 }
 
 /**
- * A 2D point identifying a cell on a two-dimensional game board. 
+ * A 2D point identifying a cell on a two-dimensional game board.
+ * The top-left cell is (0, 0).
  * Points are immutable.
  */
 class Point {
