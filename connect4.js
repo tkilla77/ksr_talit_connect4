@@ -30,8 +30,12 @@ export function toJson(game, userid) {
 }
 export function isWaiting(game, userid) {
   return game.state == "waiting" && game.player1 != userid;
-
 }
+
+export function getCurrentPlayer(game) {
+  return game.next == 1 ? game.player1 : game.player2;
+}
+
 export function joinGame(game, userid) {
   if (!isWaiting(game, userid)) {
     throw Error("Not waiting!");

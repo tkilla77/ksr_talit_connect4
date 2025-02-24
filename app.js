@@ -1,10 +1,10 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
-import { newGame, dropPiece, toJson, isWaiting, joinGame } from './connect4.js'
+import { newGame, dropPiece, toJson, isWaiting, joinGame, getCurrentPlayer } from './connect4.js'
 
 const app = express()
 app.use(cookieParser())
-const port = 0
+const port = 0 // 0 means using a random free port
 
 let nextGameId = 0;
 let games = {};
@@ -14,6 +14,7 @@ let games = {};
 // 'static/connect4.html'
 app.use(express.static('static'))
 
+/** Extract the user id from the cookie, or set a fresh cookie if it does not exist. */
 function getUserId(req, res) {
     let userid = req.cookies.userid
     if (userid == undefined) {
@@ -22,9 +23,11 @@ function getUserId(req, res) {
     }
     return userid
 }
- 
+
+/** Join a new or waiting game. */
 app.get('/join', (req, res) => {
     const userid = getUserId(req, res)
+    // First attempt to find a waiting game and join that.
     for (let game of Object.values(games)) {
         if (isWaiting(game, userid)) {
             joinGame(game, userid)
@@ -41,6 +44,7 @@ app.get('/join', (req, res) => {
     res.json(toJson(game, userid))
 })
 
+/** Serve the game state of any valid game id. */
 app.get('/game/:gameid', (req, res) => {
     const userid = getUserId(req, res);
     const game = games[parseInt(req.params['gameid'])]
@@ -51,12 +55,15 @@ app.get('/game/:gameid', (req, res) => {
     }
 })
 
+/** Make a play. Only allows the joined players to  */
 app.get('/set/:gameid/:column', (req, res) => {
     const userid = getUserId(req, res);
     const game = games[parseInt(req.params['gameid'])]
     if (game == undefined) {
         res.status(401).json("no such game");
-    } else if (game.player1 == userid && game.next == 1 || game.player2 == userid && game.next == 2) {
+    } else if (game.state != "playing") {
+        res.status(404).json("game is not playing");
+    } else if (getCurrentPlayer(game) == userid) {
         let column = parseInt(req.params['column']);
         dropPiece(game, column);
         res.json(toJson(game, userid));
