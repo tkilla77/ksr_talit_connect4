@@ -26,6 +26,17 @@ h1 {
     text-align: center;
 }
 
+c4-joining {
+    display: flex;
+    flex-direction: row;
+    flex-flow: nowrap;
+    margin: 1em 0;
+    gap: 1em
+}
+#gameid:invalid {
+    background-color: lightpink;
+}
+
 c4-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);

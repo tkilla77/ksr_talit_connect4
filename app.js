@@ -44,6 +44,14 @@ app.get('/join', (req, res) => {
     res.json(toJson(game, userid))
 })
 
+/** Join a specific game (from join code). */
+app.get('/join/:gameid', (req, res) => {
+    const userid = getUserId(req, res)
+    const game = games[parseInt(req.params['gameid'])]
+    joinGame(game, userid)
+    res.json(toJson(game, userid))
+})
+
 /** Serve the game state of any valid game id. */
 app.get('/game/:gameid', (req, res) => {
     const userid = getUserId(req, res);
