@@ -95,7 +95,7 @@ async function init() {
   });
   
   join.addEventListener("click", () => {
-    let id = parseInt(gameid.textContent)
+    let id = parseInt(gameid.value)
     if (id >= 0)
       handleFetch(grid, status, `join/${id}`)
     else

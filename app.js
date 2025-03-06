@@ -48,8 +48,18 @@ app.get('/join', (req, res) => {
 app.get('/join/:gameid', (req, res) => {
     const userid = getUserId(req, res)
     const game = games[parseInt(req.params['gameid'])]
-    joinGame(game, userid)
-    res.json(toJson(game, userid))
+    if (game == undefined) {
+        res.status(404).json("no such game");
+    } else if (isWaiting(game)) {
+        joinGame(game, userid)
+        res.json(toJson(game, userid))
+    } else if (game.player1 == userid || game.player2 == userid) {
+        // already part of the game
+        res.json(toJson(game, userid))
+    } else {
+        res.status(403);
+        res.json("Not your game, my friend");
+    }
 })
 
 /** Serve the game state of any valid game id. */
@@ -57,7 +67,7 @@ app.get('/game/:gameid', (req, res) => {
     const userid = getUserId(req, res);
     const game = games[parseInt(req.params['gameid'])]
     if (game == undefined) {
-        res.status(401).json("no such game");
+        res.status(404).json("no such game");
     } else {
         res.json(toJson(game, userid))
     }
@@ -68,9 +78,9 @@ app.get('/set/:gameid/:column', (req, res) => {
     const userid = getUserId(req, res);
     const game = games[parseInt(req.params['gameid'])]
     if (game == undefined) {
-        res.status(401).json("no such game");
+        res.status(404).json("no such game");
     } else if (game.state != "playing") {
-        res.status(404).json("game is not playing");
+        res.status(403).json("game is not playing");
     } else if (getCurrentPlayer(game) == userid) {
         let column = parseInt(req.params['column']);
         dropPiece(game, column);
