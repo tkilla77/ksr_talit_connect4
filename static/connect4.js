@@ -59,7 +59,7 @@ async function handleFetch(grid, status, url) {
     // Update game status area to reflect winner / tie
     updateStatus(status, game);
   }
-  while (game.state == "waiting" || game.state == "playing" && !game.myturn) {
+  if (!response.ok || game.state == "waiting" || game.state == "playing" && !game.myturn) {
     await wait(500);
     await handleFetch(grid, status, `game/${game.id}`);
   }
