@@ -47,9 +47,15 @@ app.get('/join', (req, res) => {
 /** Join a specific game (from join code). */
 app.get('/join/:gameid', (req, res) => {
     const userid = getUserId(req, res)
-    const game = games[parseInt(req.params['gameid'])]
+    const id = parseInt(req.params['gameid'])
+    const game = games[id]
     if (game == undefined) {
-        res.status(404).json("no such game");
+        let game = newGame(id)
+        games[id] = game
+        nextGameId = Math.max(nextGameId, id) + 1
+        console.log(`Started game ${game.id}`)
+        joinGame(game, userid)
+        res.json(toJson(game, userid))
     } else if (isWaiting(game)) {
         joinGame(game, userid)
         res.json(toJson(game, userid))
