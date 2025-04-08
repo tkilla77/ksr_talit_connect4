@@ -35,7 +35,7 @@ app.get('', (req, res) => {
     for (let game of Object.values(games)) {
         if (isWaiting(game, userid)) {
             joinGame(game, userid)
-            console.log(`Joined game ${game.id}`)
+            console.log(`Game ${game.id} randomly joined by ${userid}`)
             res.redirect(`${game.id}/`)
             return
         }
@@ -46,7 +46,7 @@ app.get('', (req, res) => {
     nextGameId += 1
     
     joinGame(game, userid)
-    console.log(`Started game ${game.id}`)
+    console.log(`Game ${game.id} started by ${userid}`)
     res.redirect(`${game.id}/`)
 })
 
@@ -57,7 +57,8 @@ app.get('/:gameid/game', (req, res) => {
     if (game == undefined) {
         res.status(404).json("no such game");
     } else {
-        if (isWaiting(game)) {
+        if (isWaiting(game, userid)) {
+            console.log(`Game ${game.id} directly joined by ${userid}`)
             joinGame(game, userid)
         }
         res.json(toJson(game, userid))
