@@ -9,11 +9,6 @@ const port = 0 // 0 means using a random free port
 let nextGameId = 0;
 let games = {};
  
-// Serve all files from static/ as is.
-// For example, a request for '/connect4.html' will be served from
-// 'static/connect4.html'
-app.use(express.static('static'))
-
 /** Extract the user id from the cookie, or set a fresh cookie if it does not exist. */
 function getUserId(req, res) {
     let userid = req.cookies.userid
@@ -23,15 +18,25 @@ function getUserId(req, res) {
     }
     return userid
 }
+// Serve the main entry from 'play/:gameid'
+app.get('/:gameid(\\d+)/', (req, res) => {
+    res.sendFile('/static/connect4.html', {root: import.meta.dirname})
+})
+// Serve all files from static/ folder as is.
+// For example, a request for 'connect4.css' will be served from
+// 'static/connect4.css'
+
+app.use('/:gameid(\\d+)/', express.static('static'))
 
 /** Join a new or waiting game. */
-app.get('/join', (req, res) => {
+app.get('', (req, res) => {
     const userid = getUserId(req, res)
     // First attempt to find a waiting game and join that.
     for (let game of Object.values(games)) {
         if (isWaiting(game, userid)) {
             joinGame(game, userid)
-            res.json(toJson(game, userid))
+            console.log(`Joined game ${game.id}`)
+            res.redirect(`${game.id}/`)
             return
         }
     }
@@ -41,46 +46,26 @@ app.get('/join', (req, res) => {
     nextGameId += 1
     
     joinGame(game, userid)
-    res.json(toJson(game, userid))
-})
-
-/** Join a specific game (from join code). */
-app.get('/join/:gameid', (req, res) => {
-    const userid = getUserId(req, res)
-    const id = parseInt(req.params['gameid'])
-    const game = games[id]
-    if (game == undefined) {
-        let game = newGame(id)
-        games[id] = game
-        nextGameId = Math.max(nextGameId, id) + 1
-        console.log(`Started game ${game.id}`)
-        joinGame(game, userid)
-        res.json(toJson(game, userid))
-    } else if (isWaiting(game)) {
-        joinGame(game, userid)
-        res.json(toJson(game, userid))
-    } else if (game.player1 == userid || game.player2 == userid) {
-        // already part of the game
-        res.json(toJson(game, userid))
-    } else {
-        res.status(403);
-        res.json("Not your game, my friend");
-    }
+    console.log(`Started game ${game.id}`)
+    res.redirect(`${game.id}/`)
 })
 
 /** Serve the game state of any valid game id. */
-app.get('/game/:gameid', (req, res) => {
+app.get('/:gameid/game', (req, res) => {
     const userid = getUserId(req, res);
     const game = games[parseInt(req.params['gameid'])]
     if (game == undefined) {
         res.status(404).json("no such game");
     } else {
+        if (isWaiting(game)) {
+            joinGame(game, userid)
+        }
         res.json(toJson(game, userid))
     }
 })
 
 /** Make a play. Only allows the joined players to  */
-app.get('/set/:gameid/:column', (req, res) => {
+app.get('/:gameid/set/:column', (req, res) => {
     const userid = getUserId(req, res);
     const game = games[parseInt(req.params['gameid'])]
     if (game == undefined) {
@@ -99,5 +84,5 @@ app.get('/set/:gameid/:column', (req, res) => {
 
 // Listen on the given port
 const server = app.listen(port, () => {
-    console.log(`Example app listening on http://localhost:${server.address().port}/connect4.html`)
+    console.log(`Example app listening on http://localhost:${server.address().port}/`)
 })

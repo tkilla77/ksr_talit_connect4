@@ -42,7 +42,7 @@ async function dropPiece(grid, status, column) {
     return;
   }
 
-  handleFetch(grid, status, `set/${game.id}/${column}`);
+  handleFetch(grid, status, `set/${column}`);
 }
 
 // wait ms milliseconds
@@ -61,7 +61,7 @@ async function handleFetch(grid, status, url) {
   }
   if (!response.ok || game.state == "waiting" || game.state == "playing" && !game.myturn) {
     await wait(500);
-    await handleFetch(grid, status, `game/${game.id}`);
+    await handleFetch(grid, status, `game`);
   }
 }
 
@@ -70,38 +70,8 @@ async function init() {
   // Find the HTML game grid.
   let grid = document.getElementsByTagName('c4-grid')[0];
   let status = document.getElementsByTagName('c4-status')[0];
-  
-  
-  let join = document.querySelector("#join")
-  let gameid = document.querySelector("#gameid")
-  gameid.addEventListener("input", () => {
-    try {
-      text = gameid.value
-      if (text.length == 0) {
-        join.removeAttribute("disabled")
-        join.textContent = "Join Random Game"
-        return
-      } else {
-        id = parseInt(text)
-        if (id >= 0) {
-          join.textContent = "Join Game"
-          join.removeAttribute("disabled")
-          return
-        }
-      }
-    } catch {}
-    join.textContent = "Game Id must be a number!"
-    join.setAttribute("disabled", "1")
-  });
-  
-  join.addEventListener("click", () => {
-    let id = parseInt(gameid.value)
-    if (id >= 0)
-      handleFetch(grid, status, `join/${id}`)
-    else
-      handleFetch(grid, status, `join`)
-  });
 
+  handleFetch(grid, status, 'game')
 
   // Install button click handlers for each button.
   let index = 0
