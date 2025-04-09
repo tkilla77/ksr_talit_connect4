@@ -18,15 +18,16 @@ function getUserId(req, res) {
     }
     return userid
 }
-// Serve the main entry from 'play/:gameid'
+// Serve the main entry from '/:gameid/'
 app.get('/:gameid(\\d+)/', (req, res) => {
     res.sendFile('/static/connect4.html', {root: import.meta.dirname})
 })
-// Serve all files from static/ folder as is.
-// For example, a request for 'connect4.css' will be served from
+// Serve all files from static/ folder as is, for all game ids.
+// For example, a request for '/42/connect4.css' will be served from
 // 'static/connect4.css'
-
 app.use('/:gameid(\\d+)/', express.static('static'))
+
+// TODO: separate game creation / joining / getting.
 
 /** Join a new or waiting game. */
 app.get('', (req, res) => {
