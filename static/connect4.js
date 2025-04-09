@@ -42,7 +42,7 @@ async function dropPiece(grid, status, column) {
     return;
   }
 
-  handleFetch(grid, status, `set/${game.id}/${column}`);
+  handleFetch(grid, status, `set/${column}`);
 }
 
 // wait ms milliseconds
@@ -52,14 +52,16 @@ async function wait(ms) {
 
 async function handleFetch(grid, status, url) {
   let response = await fetch(url);
-  game = await response.json();
-  // Update the HTML view.
-  updateHtml(grid, game);
-  // Update game status area to reflect winner / tie
-  updateStatus(status, game);
-  while (game.state == "waiting" || game.state == "playing" && !game.myturn) {
+  if (response.ok) {
+    game = await response.json();
+    // Update the HTML view.
+    updateHtml(grid, game);
+    // Update game status area to reflect winner / tie
+    updateStatus(status, game);
+  }
+  if (!response.ok || game.state == "waiting" || game.state == "playing" && !game.myturn) {
     await wait(500);
-    await handleFetch(grid, status, `game/${game.id}`);
+    await handleFetch(grid, status, `game`);
   }
 }
 
@@ -68,7 +70,8 @@ async function init() {
   // Find the HTML game grid.
   let grid = document.getElementsByTagName('c4-grid')[0];
   let status = document.getElementsByTagName('c4-status')[0];
-  await handleFetch(grid, status, `join`);
+
+  handleFetch(grid, status, 'game')
 
   // Install button click handlers for each button.
   let index = 0
