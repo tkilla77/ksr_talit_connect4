@@ -83,3 +83,8 @@ async function init() {
 }
 
 init();
+
+webSocket = new WebSocket('/echo');
+webSocket.onopen = (event) => {
+  webSocket.send("Hello!");
+};

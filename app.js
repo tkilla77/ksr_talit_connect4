@@ -1,8 +1,9 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
+import { WebSocketExpress, Router } from 'websocket-express';
 import { newGame, dropPiece, toJson, isWaiting, joinGame, getCurrentPlayer } from './connect4.js'
 
-const app = express()
+const app = new WebSocketExpress();
 app.use(cookieParser())
 const port = 0 // 0 means using a random free port
 
@@ -82,6 +83,14 @@ app.get('/:gameid/set/:column', (req, res) => {
         res.status(403);
         res.json("Not your turn, my friend");
     }
+})
+
+app.ws('/echo', async (req, res) => {
+    const ws = await res.accept();
+    ws.on('message', (msg) => {
+      ws.send(`echo ${msg}`);
+    });
+    ws.send('hello');
 })
 
 // Listen on the given port
