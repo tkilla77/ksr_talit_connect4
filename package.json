@@ -19,7 +19,6 @@
   "description": "",
   "dependencies": {
     "cookie-parser": "^1.4.7",
-    "express": "^4.21.2",
-    "websocket-express": "^3.1.2"
+    "express": "^4.21.2"
   }
 }

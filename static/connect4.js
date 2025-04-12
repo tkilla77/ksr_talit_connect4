@@ -61,7 +61,7 @@ async function handleFetch(grid, status, url) {
   }
   if (!response.ok || game.state == "waiting" || game.state == "playing" && !game.myturn) {
     await wait(500);
-    await handleFetch(grid, status, `game`);
+    await handleFetch(grid, status, `longpoll`);
   }
 }
 
@@ -83,8 +83,3 @@ async function init() {
 }
 
 init();
-
-webSocket = new WebSocket('/echo');
-webSocket.onopen = (event) => {
-  webSocket.send("Hello!");
-};
