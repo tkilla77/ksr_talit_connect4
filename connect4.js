@@ -32,6 +32,10 @@ export function isWaiting(game, userid) {
   return game.state == "waiting" && game.player1 != userid;
 }
 
+export function shouldBlockRequest(game, userid) {
+  return game.state == "waiting" || game.state == "playing" && getCurrentPlayer(game) != userid;
+}
+
 export function getCurrentPlayer(game) {
   return game.next == 1 ? game.player1 : game.player2;
 }

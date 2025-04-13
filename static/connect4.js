@@ -59,9 +59,11 @@ async function handleFetch(grid, status, url) {
     // Update game status area to reflect winner / tie
     updateStatus(status, game);
   }
+  if (!response.ok) {
+    await wait(500)
+  }
   if (!response.ok || game.state == "waiting" || game.state == "playing" && !game.myturn) {
-    await wait(500);
-    await handleFetch(grid, status, `game`);
+    await handleFetch(grid, status, `longpoll`);
   }
 }
 
