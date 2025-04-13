@@ -7,7 +7,10 @@ app.use(cookieParser())
 const port = 0 // 0 means using a random free port
 
 let nextGameId = 0;
+/** All games by gameid. */
 let games = {};
+/** All long-poll requests by gameid. For each gameid, a list of 
+  * [response, userid] entries is stored.  */
 let longpolls = {};
  
 /** Extract the user id from the cookie, or set a fresh cookie if it does not exist. */
@@ -67,17 +70,25 @@ app.get('/:gameid/game', (req, res) => {
     }
 })
 
+/** Lets the given userid join the game, and sends any pending
+  * long-polling responses. */
 function join(game, userid) {
     joinGame(game, userid)
     sendLongPollResponses(game)
 }
 
+/** Sends any pending long-polling responses after a state change. */
 function sendLongPollResponses(game) {
     let polls = longpolls[game.id]
     delete longpolls[game.id]
     if (polls) {
         for (let response of polls) {
-            response[0].json(toJson(game, response[1]))
+            // a response object is a list with the actual HTTP response and the userid.
+            let res = response[0]
+            let userid = response[1]
+            console.log(`End long-poll request for ${game.id} by ${userid}`)
+            res.json(toJson(game, userid))
+            res.end()
         }
     }
 }
@@ -98,14 +109,15 @@ app.get('/:gameid/longpoll', (req, res) => {
             return
         }
         // Check if userid needs to wait, then either:
+        // - stash the [response, userid] pair for later
         // - instantly return actionable state
-        // - or block until timeout or state change occurs
         if (shouldBlockRequest(game, userid)) {
             console.log(`Stash long-poll request for ${game.id} by ${userid}`)
             longpolls[game.id] ??= []
             longpolls[game.id].push([res, userid])
             // do not end here but keep request hanging.
         } else {
+            // User can act on the state, no point in waiting.
             res.json(toJson(game, userid))
             res.end()
         }
