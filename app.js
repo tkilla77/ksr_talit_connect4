@@ -39,8 +39,8 @@ app.get('', (req, res) => {
     // First attempt to find a waiting game and join that.
     for (let game of Object.values(games)) {
         if (isWaiting(game, userid)) {
-            join(game, userid)
             console.log(`Game ${game.id} randomly joined by ${userid}`)
+            join(game, userid)
             res.redirect(`${game.id}/`)
             return
         }
