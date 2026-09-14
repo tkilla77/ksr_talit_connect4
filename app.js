@@ -4,7 +4,7 @@ import { newGame, dropPiece, toJson, isWaiting, joinGame, getCurrentPlayer, shou
 
 const app = express();
 app.use(cookieParser())
-const port = 0 // 0 means using a random free port
+const port = parseInt(process.env.PORT) || 3001;
 
 let nextGameId = 0;
 /** All games by gameid. */
