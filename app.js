@@ -144,6 +144,6 @@ app.get('/:gameid/set/:column', (req, res) => {
 })
 
 // Listen on the given port
-const server = app.listen(port, () => {
+const server = app.listen(port, '0.0.0.0', () => {
     console.log(`Example app listening on http://localhost:${server.address().port}/`)
 })
